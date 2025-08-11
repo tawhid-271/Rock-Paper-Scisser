@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="logo.png" type="image/png">
+<title>Tawhid Game </title>
+
+<style>
+    /* ---------- Reset & Base ---------- */
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, Arial, sans-serif}
+    html,body{height:100%}
+    body{
+        background:linear-gradient(180deg,#071026 0%, #0a1330 100%);
+        color:#e6eef8;
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
+        overflow-y:auto;
+        padding:10px;
+    }
+
+    /* ---------- Animations ---------- */
+    @keyframes fadeUp { from {opacity:0; transform: translateY(10px);} to {opacity:1; transform: translateY(0);} }
+    @keyframes slideDown { from {opacity:0; transform: translateY(-20px);} to {opacity:1; transform: translateY(0);} }
+    @keyframes click-bounce { 0% { transform: scale(1);} 50% { transform: scale(1.26);} 100% { transform: scale(1);} }
+    @keyframes glow { 0% { box-shadow: 0 0 0 rgba(0,0,0,0);} 50% { box-shadow: 0 6px 30px rgba(0,212,255,0.12);} 100% { box-shadow: 0 0 0 rgba(0,0,0,0);} }
+
+    /* ---------- Header ---------- */
+    header{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:12px 18px;
+        background:#10284e;
+        border-radius:10px;
+        box-shadow:0 6px 20px rgba(2,6,23,0.6);
+        animation: slideDown .5s ease both;
+    }
+    .logo img{height:72px;transition:transform .25s ease, filter .25s ease; border-radius:8px; animation:fadeUp .5s .05s both}
+    nav ul{display:flex;gap:16px;list-style:none}
+    nav a{color:#fff;text-decoration:none;font-weight:700;padding:6px 8px;border-radius:6px;transition:background .15s}
+    nav a:hover{background:rgba(255,255,255,0.03)}
+
+    /* ---------- Main Layout ---------- */
+    main{display:flex;gap:20px;padding:18px 0;flex:1;align-items:flex-start}
+    .hero{
+        flex:1;
+        min-height:360px;
+        border-radius:12px;
+        background:
+            linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.55)),
+            url('gaming.jpg') center/cover no-repeat;
+        display:flex;align-items:center;justify-content:center;padding:18px;
+        box-shadow:0 8px 26px rgba(2,6,23,0.6);
+        animation:fadeUp .5s .08s both;
+    }
+    .hero-content{
+        background:linear-gradient(180deg, rgba(6,12,28,0.8), rgba(4,10,20,0.75));
+        padding:18px;border-radius:10px;width:100%;max-width:700px;text-align:center;
+        border:1px solid rgba(255,255,255,0.03);
+    }
+    .hero-content h1{font-size:1.8rem;margin-bottom:8px;color:#ffd54a}
+    .hero-content p.small{color:#bcd2ea;margin-bottom:10px}
+
+    .hero-content .search{display:flex;gap:8px;justify-content:center;margin-top:8px}
+    .hero-content input[type="text"]{
+        padding:10px 12px;border-radius:8px;border:none;outline:none;width:320px;background:#132642;color:#eaf4ff;transition:box-shadow .12s ease;
+    }
+    .hero-content input[type="text"]:focus{box-shadow:0 6px 24px rgba(0,212,255,0.08)}
+    .hero-content button.search-btn{
+        padding:10px 14px;border-radius:8px;border:none;background:#00d4ff;color:#001a24;font-weight:700;cursor:pointer;
+    }
+
+    /* ---------- Comments Section ---------- */
+    section.comments{margin-top:14px;max-width:640px;margin-left:auto;margin-right:auto; animation:fadeUp .5s .18s both}
+    .comments label{display:block;font-weight:700;margin-bottom:8px}
+    .comments textarea{
+        width:100%;min-height:110px;padding:12px;border-radius:8px;border:none;background:#12283f;color:#eaf4ff;
+        resize:vertical;outline:none;font-size:14px;transition:box-shadow .12s;
+    }
+    .comments textarea:focus{box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+
+    /* ---------- Game Panel ---------- */
+    .game-panel{
+        width:420px;background:linear-gradient(180deg,#081728,#0f314e);
+        border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(2,6,23,0.7);
+        border:1px solid rgba(255,255,255,0.03); animation:fadeUp .5s .10s both;
+    }
+    .game-panel h2{font-size:1.15rem;margin-bottom:8px;color:#fff}
+    .scoreboard{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .card{
+        flex:1;min-width:96px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        padding:10px;border-radius:8px;text-align:center;transition:transform .14s ease, box-shadow .14s;
+    }
+    .card .small{font-size:12px;color:#bcd2ea;margin-bottom:6px}
+    .card .value{font-size:18px;font-weight:800}
+
+    /* choices */
+    .controls{display:flex;gap:10px;margin-top:12px;justify-content:space-between}
+    .choice-btn{
+        flex:1;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:16px;color:#fff;cursor:pointer;
+        display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:center;min-height:92px;
+        box-shadow:0 6px 18px rgba(2,6,23,0.5);transition:box-shadow .12s, transform .12s;
+        user-select:none;outline:none;
+    }
+    /* subtle hover highlight only (no animation) */
+    .choice-btn:hover{box-shadow:0 10px 28px rgba(0,0,0,0.6); transform: translateY(-4px);}
+
+    /* fixed colors */
+    .rock{background:#e04b4b}      /* red */
+    .paper{background:#2fb86f}     /* green */
+    .scissors{background:#3b8ad6}  /* blue */
+
+    .choice-emoji{font-size:34px; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45))}
+    .choice-text{font-size:14px}
+
+    /* click animation class (only added/removed on click) */
+    .clicked { animation: click-bounce .32s ease both; }
+
+    .status{margin-top:12px;background:rgba(255,255,255,0.02);padding:12px;border-radius:8px;text-align:left;min-height:96px;transition:transform .12s, box-shadow .12s}
+    .status .round-title{font-weight:800;margin-bottom:8px}
+    .controls-row{display:flex;gap:8px;margin-top:12px}
+
+    .btn-new{flex:1;padding:10px;border-radius:8px;border:none;background:#00d4ff;color:#001a24;font-weight:800;cursor:pointer}
+    .btn-quit{padding:10px;border-radius:8px;border:none;background:#ff6b6b;color:#fff;font-weight:800;cursor:pointer}
+    .btn-reset{padding:10px;border-radius:8px;border:none;background:#666cff;color:#fff;font-weight:700;cursor:pointer}
+
+    footer{background:#10284e;padding:10px;text-align:center;color:#d6e9ff;margin-top:14px;border-radius:10px}
+
+    /* responsive */
+    @media(max-width:920px){
+        main{flex-direction:column;padding:12px}
+        .game-panel{width:100%}
+        .hero{min-height:220px}
+    }
+</style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logomain.png" alt="Logo" onerror="this.style.display='none'">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Easy Mod</a></li>
+                <li><a href="#">Hard Mod</a></li>
+                <li><a href="#">Difficult Mod</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- hero area (left) -->
+        <section class="hero" aria-label="Hero">
+            <div class="hero-content">
+                <h1>Tawhid's Best Website</h1>
+                <p class="small">এখানে Rock-Paper-Scissors গেম — ১০ রাউন্ড, টানা ৫ জয় বোনাস +10।</p>
+
+                <div class="search">
+                    <input type="text" id="searchInput" placeholder="Search for Friends (type name)..." />
+                    <button class="search-btn" onclick="search()">Search</button>
+                </div>
+
+                <section class="comments" style="margin-top:12px;">
+                    <label for="comments">Comments</label>
+                    <textarea id="comments" placeholder="Enter your comments..."></textarea>
+                </section>
+            </div>
+        </section>
+
+        <!-- game panel (right) -->
+        <aside class="game-panel" id="gamePanel" aria-label="Game Panel">
+            <h2>Rock ✊ Paper ✋ Scissors ✌️</h2>
+
+            <div class="scoreboard" aria-hidden="false">
+                <div class="card">
+                    <div class="small">Round</div>
+                    <div class="value" id="roundNum">0 / 10</div>
+                </div>
+                <div class="card">
+                    <div class="small">Score</div>
+                    <div class="value" id="score">0</div>
+                </div>
+                <div class="card">
+                    <div class="small">Win Streak</div>
+                    <div class="value" id="streak">0</div>
+                </div>
+                <div class="card">
+                    <div class="small">High Score</div>
+                    <div class="value" id="highscore">0</div>
+                </div>
+            </div>
+
+            <div class="controls" id="moveControls" aria-label="Moves">
+                <button class="choice-btn rock" data-move="r" title="Rock (🪨)">
+                    <div class="choice-emoji">🪨</div>
+                    <div class="choice-text">Rock</div>
+                </button>
+                <button class="choice-btn paper" data-move="p" title="Paper (📄)">
+                    <div class="choice-emoji">📄</div>
+                    <div class="choice-text">Paper</div>
+                </button>
+                <button class="choice-btn scissors" data-move="s" title="Scissors (✂️)">
+                    <div class="choice-emoji">✂️</div>
+                    <div class="choice-text">Scissors</div>
+                </button>
+            </div>
+
+            <div class="status" id="statusBox" role="status" aria-live="polite">
+                <div id="lastResult">
+                    Press "New Game" or click any move to start. Game plays 10 rounds. Win:+10, Lose:-5, Draw:0. 5 wins in a row → +10 bonus.
+                </div>
+            </div>
+
+            <div class="controls-row" style="margin-top:12px">
+                <button class="btn-new" id="newGameBtn">New Game</button>
+                <button class="btn-quit" id="quitBtn">Quit</button>
+                <button class="btn-reset" id="resetHighBtn" title="Reset High Score">Reset High Score</button>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        Copyright &copy; All rights reserved — Tawhid
+    </footer>
+
+<script>
+/* ---------- Final RPS Game with Reset High Score ---------- */
+(function(){
+    const Maindict = {"r":1,"p":2,"s":0};
+    const Reversedict = {1:"Rock",2:"Paper",0:"Scissors"};
+    const moves = {"r":"Rock","p":"Paper","s":"Scissors"};
+
+    // DOM
+    const roundNumEl = document.getElementById('roundNum');
+    const scoreEl = document.getElementById('score');
+    const streakEl = document.getElementById('streak');
+    const statusEl = document.getElementById('lastResult');
+    const highscoreEl = document.getElementById('highscore');
+    const moveControls = document.getElementById('moveControls');
+    const newGameBtn = document.getElementById('newGameBtn');
+    const quitBtn = document.getElementById('quitBtn');
+    const resetHighBtn = document.getElementById('resetHighBtn');
+
+    // state
+    let round = 0, score = 0, streak = 0, running = false;
+    const MAX_ROUNDS = 10;
+    const STORAGE_KEY = 'tawhid_rps_highscore';
+    let highscore = loadHighscore();
+    highscoreEl.textContent = highscore;
+
+    // helpers
+    function randComputer(){ return [0,1,2][Math.floor(Math.random()*3)]; }
+    function loadHighscore(){ try{ const v = localStorage.getItem(STORAGE_KEY); return v ? parseInt(v,10) : 0; }catch(e){ return 0; } }
+    function saveHighscore(val){ try{ localStorage.setItem(STORAGE_KEY, String(val)); }catch(e){} }
+    function clearHighscore(){ try{ localStorage.removeItem(STORAGE_KEY); }catch(e){} }
+    function updateUI(){
+        roundNumEl.textContent = `${Math.min(round, MAX_ROUNDS)} / ${MAX_ROUNDS}`;
+        scoreEl.textContent = score;
+        streakEl.textContent = streak;
+        highscoreEl.textContent = highscore;
+    }
+
+    function resetState(){
+        round = 0; score = 0; streak = 0; running = false;
+        updateUI();
+        statusEl.innerHTML = 'Press "New Game" or click any move to start.';
+    }
+
+    function startGame(){
+        round = 0; score = 0; streak = 0; running = true;
+        statusEl.innerHTML = 'Game started — Play 10 rounds by choosing Rock / Paper / Scissors.';
+        updateUI();
+    }
+
+    function endGame(){
+        running = false;
+        let msg = `<strong>Game Over!</strong> Final Score: ${score}.`;
+        if(score > highscore){
+            highscore = score;
+            saveHighscore(highscore);
+            msg += ` <br>🎉 New High Score: ${highscore}!`;
+        } else {
+            msg += ` <br>High Score: ${highscore}.`;
+        }
+        statusEl.innerHTML = msg;
+        updateUI();
+    }
+
+    function flashButton(el, type){
+        if(!el) return;
+        if(type==='win'){ el.classList.add('clicked'); setTimeout(()=>el.classList.remove('clicked'),360); }
+        else if(type==='lose'){ el.classList.add('clicked'); setTimeout(()=>el.classList.remove('clicked'),360); }
+    }
+
+    function handleMove(userChar){
+        if(!running){
+            startGame();
+        }
+        if(!running) return;
+        if(round >= MAX_ROUNDS){
+            endGame();
+            return;
+        }
+
+        const user = Maindict[userChar];
+        const computer = randComputer();
+
+        let roundResultText = '';
+        if(user === computer){
+            streak = 0;
+            roundResultText = "It's a draw!";
+            // small visual nudge on draw
+            document.querySelectorAll('.card').forEach(c=>{ c.style.transform='translateY(-3px)'; setTimeout(()=>c.style.transform='translateY(0)',180); });
+        } else if (
+            (user === 1 && computer === 0) ||
+            (user === 2 && computer === 1) ||
+            (user === 0 && computer === 2)
+        ){
+            // win
+            score += 10;
+            streak += 1;
+            roundResultText = "You Win!";
+            if(streak === 5){
+                score += 10;
+                roundResultText += " 🔥 Win Streak Bonus +10!";
+                streak = 0;
+            }
+            const btn = document.querySelector(`[data-move="${userChar}"]`);
+            flashButton(btn,'win');
+        } else {
+            // lose
+            score -= 5;
+            streak = 0;
+            roundResultText = "You Lose!";
+            const btn = document.querySelector(`[data-move="${userChar}"]`);
+            flashButton(btn,'lose');
+        }
+
+        round += 1;
+
+        // show round result
+        statusEl.innerHTML = `
+            <div class="round-title">Round ${round} / ${MAX_ROUNDS}</div>
+            <div>You chose: <strong>${moves[userChar]}</strong></div>
+            <div>Computer chose: <strong>${Reversedict[computer]}</strong></div>
+            <div style="margin-top:8px"><strong>${roundResultText}</strong></div>
+            <div style="margin-top:8px" class="small">Score: ${score} &nbsp; | &nbsp; Win Streak: ${streak}</div>
+        `;
+
+        updateUI();
+
+        if(round >= MAX_ROUNDS){
+            setTimeout(endGame, 420);
+        }
+    }
+
+    // attach events
+    moveControls.addEventListener('click', function(e){
+        const btn = e.target.closest('button');
+        if(!btn) return;
+        const m = btn.getAttribute('data-move');
+        if(!m) return;
+        if(!running && round >= MAX_ROUNDS){
+            statusEl.innerHTML = 'Game finished. Press "New Game" to play again.';
+            return;
+        }
+        handleMove(m);
+    });
+
+    newGameBtn.addEventListener('click', function(){ startGame(); });
+    quitBtn.addEventListener('click', function(){ running=false; statusEl.innerHTML='Game Quit. Press \"New Game\" to play again.'; });
+
+    // Reset High Score button behavior
+    resetHighBtn.addEventListener('click', function(){
+        if(confirm('Are you sure you want to reset the High Score to 0?')){
+            clearHighscore();
+            highscore = 0;
+            highscoreEl.textContent = highscore;
+            alert('High Score has been reset to 0.');
+        }
+    });
+
+    // small helper: search placeholder action
+    window.search = function(){
+        const val = document.getElementById('searchInput').value.trim();
+        if(!val) { alert('Please enter a search term.'); return; }
+        alert('Searching for: ' + val);
+    }
+
+    // init
+    resetState();
+})();
+</script>
+</body>
+</html>
